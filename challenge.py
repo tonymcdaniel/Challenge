@@ -67,9 +67,37 @@ def levenshtein_distance(word1, word2):
     # the Levenshtein distance is given by the last entry
     return d[m,n]
 
+
+def build_network(word,wordlist,degree=1):
+    """
+    Two words are friends if they have a Levenshtein distance of 1.
+    A word’s network with degree 3, consists of all of its friends,
+    all of its friends' friends, and all of its friends' friends' friends.
+
+    Returns a set of the words from wordlist that are in the network
+    of `degree` for `word`.
+    """
+    if degree < 1:
+        return set()
+    else:
+        network = set()           # completed network
+        test_words = set([word])  # new words added for current degree
+        for i in range(degree):
+            print("Finding friends "+i*"of friends "+"of '"+word+"'.")
+            friends = set()       # friends of current test_words
+            for friend in test_words:
+                friends.update([w for w in wordlist if levenshtein_distance(friend,w)==1])
+            test_words = friends.difference(network)
+            network.update(friends)
+            print("Added %d friends to network. %d total."%(len(test_words),len(network)))
+        return network
+
+
+
 def main():
     wordlist = read_wordlist()
     print levenshtein_distance("apple","bananna")
+    print levenshtein_distance("apple","snapple")
 
 
 if __name__ == '__main__':
