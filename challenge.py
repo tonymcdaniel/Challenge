@@ -68,7 +68,7 @@ def levenshtein_distance(word1, word2):
     return d[m,n]
 
 
-def build_network(word,wordlist,degree=1):
+def build_network(word,wordlist,degree=3):
     """
     Two words are friends if they have a Levenshtein distance of 1.
     A word’s network with degree 3, consists of all of its friends,
@@ -96,8 +96,10 @@ def build_network(word,wordlist,degree=1):
 
 def main():
     wordlist = read_wordlist()
-    print levenshtein_distance("apple","bananna")
-    print levenshtein_distance("apple","snapple")
+    network = build_network("word",wordlist)
+    print("Social network for 'word'")
+    for w in network:
+        print w
 
 
 if __name__ == '__main__':
