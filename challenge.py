@@ -13,6 +13,8 @@ Copyright (c) 2014 Tony R. McDaniel
 
 """
 import numpy as np
+from time import time
+import cPickle as pickle
 
 
 def read_wordlist(infile="randomlist.txt"):
@@ -68,7 +70,7 @@ def levenshtein_distance(word1, word2):
     return d[m,n]
 
 
-def build_network(word,wordlist,degree=3):
+def build_network(word,wordlist,friend_dict=None,degree=3):
     """
     Two words are friends if they have a Levenshtein distance of 1.
     A word’s network with degree 3, consists of all of its friends,
@@ -82,21 +84,63 @@ def build_network(word,wordlist,degree=3):
     else:
         network = set()           # completed network
         test_words = set([word])  # new words added for current degree
+
         for i in range(degree):
             print("Finding friends "+i*"of friends "+"of '"+word+"'.")
             friends = set()       # friends of current test_words
             for friend in test_words:
-                friends.update([w for w in wordlist if levenshtein_distance(friend,w)==1])
+                if friend_dict:
+                    friends.update(friend_dict[friend])
+                else:
+                    test_list = [w for w in wordlist if abs(len(w)-len(word)) < 2]
+                    friends.update([w for w in test_list if levenshtein_distance(friend,w)==1])
             test_words = friends.difference(network)
             network.update(friends)
             print("Added %d friends to network. %d total."%(len(test_words),len(network)))
         return network
 
 
+def build_friends(wordlist):
+    """
+    Two words are friends if they have a Levenshtein distance of 1.
+
+    Returns a dictionary { key : value } where each key is a word from
+    `wordlist` and the each value is the set of friends.
+    """
+    friends = {}
+    for word in wordlist:
+        test_list = [w for w in wordlist if abs(len(w)-len(word)) < 2]
+        friends[word] = set([w for w in test_list if levenshtein_distance(word,w)==1])
+    return friends
+
+
 
 def main():
     wordlist = read_wordlist()
+    # test with search through wordlist
+    print("Building social network.")
+    start = time()
     network = build_network("word",wordlist)
+    end = time()
+    print("Finished building network in %f seconds."%(end-start))
+
+    # test building dictionary
+    print("Building friend dictionary for word list.")
+    start = time()
+    friend_dict = build_friends(wordlist)
+    end = time()
+    print("Finished building friend dictionary in %f seconds."%(end-start))
+    pickle.dump(friend_dict, open("randomlist.p","wb"))
+
+    # test with pre-built dictionary
+    print("Loading friend dictionary for word list.")
+    friend_dict = pickle.load(open("randomlist.p","rb"))
+    start = time()
+    network = build_network("word",wordlist,friend_dict)
+    end = time()
+    print("Finished building network in %f seconds."%(end-start))
+
+    # print result
     print("Social network for 'word'")
     for w in network:
         print w
