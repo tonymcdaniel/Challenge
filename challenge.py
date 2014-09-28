@@ -97,34 +97,28 @@ def build_network(word,wordlist,degree=3):
         return network
 
 
-def test():
+def main():
+    """
+    Build the social network for the word given as the first command
+    line argument or using "word" if not specified.
+    """
+    if len(sys.argv) == 1:
+        # no word specified, so run the test case
+        word = "word"
+    elif len(sys.argv) == 2:
+        word = sys.argv[1]
+    else:
+        print("Usage : "+sys.argv[0]+" [word]")
+        sys.exit()
     # load the wordlist from randomwords.txt
     wordlist = read_wordlist()
 
     # test with search through wordlist
     print("Building social network.")
     start = time()
-    network = build_network("word",wordlist)
+    network = build_network(sys.argv[1],wordlist)
     end = time()
     print("Finished building network in %f seconds."%(end-start))
-
-
-def main():
-    if len(sys.argv) == 1:
-        # no word specified, so run the test case
-        test()
-    elif len(sys.argv) == 2:
-        # load the wordlist from randomwords.txt
-        wordlist = read_wordlist()
-
-        # test with search through wordlist
-        print("Building social network.")
-        start = time()
-        network = build_network(sys.argv[1],wordlist)
-        end = time()
-        print("Finished building network in %f seconds."%(end-start))
-    else:
-        print("Usage : "+sys.argv[0]+" [word]")
 
 
 if __name__ == '__main__':
