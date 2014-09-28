@@ -23,8 +23,8 @@ def read_wordlist(infile="randomlist.txt"):
     with each line as an element.
     """
     print("Loading wordlist from : "+infile)
-    with open(infile,'r') as f:
-        wordlist = [ w.strip() for w in f.readlines() ]
+    with open(infile, 'r') as f:
+        wordlist = [w.strip() for w in f.readlines()]
     print("Loaded %d words."%len(wordlist))
     return wordlist
 
@@ -70,7 +70,7 @@ def levenshtein_distance(word1, word2):
     return d[m,n]
 
 
-def build_network(word,wordlist,degree=3):
+def build_network(word, wordlist, degree=3):
     """
     Two words are friends if they have a Levenshtein distance of 1.
     A word’s network with degree 3, consists of all of its friends,
@@ -90,10 +90,12 @@ def build_network(word,wordlist,degree=3):
             friends = set()       # friends of current test_words
             for friend in test_words:
                 test_list = [w for w in wordlist if abs(len(w)-len(word)) < 2]
-                friends.update([w for w in test_list if levenshtein_distance(friend,w)==1])
+                friends.update([w for w in test_list if
+                                levenshtein_distance(friend, w) == 1])
             test_words = friends.difference(network)
             network.update(friends)
-            print("Added %d friends to network. %d total."%(len(test_words),len(network)))
+            print("Added %d friends to network. %d total."
+                  %(len(test_words), len(network)))
         return network
 
 
@@ -116,9 +118,9 @@ def main():
     # test with search through wordlist
     print("Building social network.")
     start = time()
-    network = build_network(sys.argv[1],wordlist)
+    network = build_network(word, wordlist)
     end = time()
-    print("Finished building network in %f seconds."%(end-start))
+    print("Finished building network in %f seconds."%(end - start))
 
 
 if __name__ == '__main__':
